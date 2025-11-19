@@ -1,36 +1,33 @@
 'use strict';
 
-function generateDrawingBoard() {
-    cells = [];
-    const cellWidth = drawingBoardSize / gridSize;
+let cells = [];
 
-    let oldDrawingBoard = gameContainer.querySelector('.drawing-board');
+function generateDrawingBoard(parentNode, beforeNode, gridSize, isGridOn) {
+    cells = [];
+
+    let oldDrawingBoard = parentNode.querySelector('.drawing-board');
     if (oldDrawingBoard) {
-        gameContainer.removeChild(oldDrawingBoard);
+        parentNode.removeChild(oldDrawingBoard);
     }
     const drawingBoard = document.createElement('div');
     drawingBoard.classList.add('drawing-board');
+    drawingBoard.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    drawingBoard.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+    drawingBoard.style.outline = isGridOn ? 'none' : '0.5px solid rgb(0, 0, 0)';
 
-    for (let i = 0; i < gridSize; i++) {
-        const row = document.createElement('div');
-        row.className = 'grid-row';
+    for (let i = 0; i < gridSize * gridSize; i++) {
+        const cell = document.createElement('div');
+        cell.className = `grid-cell cell${i % gridSize + Math.floor(i / gridSize) * gridSize}`;
+        cell.style.border = isGridOn ? '0.5px solid rgb(0, 0, 0)' : 'none';
 
-        for (let j = 0; j < gridSize; j++) {
-            const cell = document.createElement('div');
-            cell.className = `grid-cell cell${gridSize * i + j}`;
-            cell.setAttribute('style', `width: ${cellWidth}px; height: ${cellWidth}px;`);
-            cell.style.border = isGridOn ? '0.5px solid rgb(0, 0, 0)' : 'none'
-
-            row.appendChild(cell);
-            cells.push(cell);
-        }
-        drawingBoard.appendChild(row);
+        cells.push(cell);
+        drawingBoard.appendChild(cell);
     }
 
     drawingBoard.onmouseover = (e) => paintCell(e);
     drawingBoard.onmousedown = (e) => paintCell(e);
 
-    gameContainer.appendChild(drawingBoard);
+    beforeNode.after(drawingBoard);
     return drawingBoard;
 }
 
@@ -50,50 +47,20 @@ function paintCell(e) {
     cells[+cellIndex].style.backgroundColor = targetColor;
 }
 
-function toggleGrid() {
-    isGridOn = !isGridOn;
+function toggleGrid(isGridOn, drawingBoard) {
+    let newGridOn = !isGridOn;
+    cells.forEach((item) => {
+        item.style.border = newGridOn ? '0.5px solid rgb(0, 0, 0)' : 'none';
+    });
 
-    cells.forEach((item) => item.style.border = isGridOn ? '0.5px solid rgb(0, 0, 0)' : 'none');
+    drawingBoard.style.outline = newGridOn ? 'none' : '0.5px solid rgb(0, 0, 0)';
+    return newGridOn;
 }
 
 function toggleDefaultMode(e) {
     changeColorMode('defaultMode');
 
-    color = e.target.value;
-    colorPicker.style.background = color;
-}
-
-function toggleRainbowMode() {
-    changeColorMode('rainbowMode');
-
-    if (colorModes.rainbowMode.isModeOn) {
-        colorPicker.style.background = `linear-gradient(
-            90deg,
-            rgba(255, 0, 0, 1) 0%,
-            rgba(255, 154, 0, 1) 10%,
-            rgba(208, 222, 33, 1) 20%,
-            rgba(79, 220, 74, 1) 30%,
-            rgba(63, 218, 216, 1) 40%,
-            rgba(47, 201, 226, 1) 50%,
-            rgba(28, 127, 238, 1) 60%,
-            rgba(95, 21, 242, 1) 70%,
-            rgba(186, 12, 248, 1) 80%,
-            rgba(251, 7, 217, 1) 90%,
-            rgba(255, 0, 0, 1) 100%
-        )`;
-    } else {
-        colorPicker.style.background = 'transparent';
-    } 
-}
-
-function toggleEraserMode() {
-    changeColorMode('eraserMode');
-
-    if (colorModes.eraserMode.isModeOn) {
-        colorPicker.style.background = 'white';
-    } else {
-        colorPicker.style.background = 'transparent';
-    }
+    return e.target.value;
 }
 
 function getRandomColor() {
@@ -101,17 +68,19 @@ function getRandomColor() {
     return `rgb(${rand()}, ${rand()}, ${rand()})`; 
 }
 
-let cells = [];
-const drawingBoardSize = 500;
-let gridSize = 16;
-let isGridOn = false;
-
 const gameContainer = document.body.querySelector('.game-container');
-const drawingBoard = generateDrawingBoard();
-const optionsPanel = document.body.querySelector('.options-panel');
+let gridSize = 16;
 
-const gridBtn = optionsPanel.querySelector('.grid-btn');
-gridBtn.onclick = () => toggleGrid();
+const gridSizeArea = gameContainer.querySelector('.grid-size-area');
+const gridSizeLabel = gridSizeArea.querySelector('label');
+const gridSizeInputElement = gridSizeArea.querySelector('input');
+gridSizeInputElement.oninput = (e) => { 
+    gridSize = e.target.value; 
+    gridSizeLabel.textContent = `${gridSize} * ${gridSize}`; 
+    drawingBoard = generateDrawingBoard(gameContainer, gridSizeArea, gridSize, isGridOn);
+};
+
+let drawingBoard = generateDrawingBoard(gameContainer, gridSizeArea, gridSize, false);
 
 const colorModes = {
     defaultMode: {
@@ -127,6 +96,7 @@ const colorModes = {
         getColor: () => 'white',
     },
 }
+
 function changeColorMode(newMode) {
     if (newMode != 'defaultMode' && colorModes[newMode].isModeOn) {
         colorModes[newMode].isModeOn = false;
@@ -138,6 +108,7 @@ function changeColorMode(newMode) {
         colorModes[mode].isModeOn = (mode == newMode);
     }
 }
+
 function getColor() {
     let color;
     for (const mode in colorModes) {
@@ -149,20 +120,20 @@ function getColor() {
     return color;
 }
 
+const optionsPanel = document.body.querySelector('.options-panel');
+let isGridOn = false;
+const gridBtn = optionsPanel.querySelector('.grid-btn');
+gridBtn.onclick = () => { isGridOn = toggleGrid(isGridOn, drawingBoard); };
+
 let color = '#000000';
 const colorPicker = optionsPanel.querySelector('.color-picker');
-colorPicker.oninput = (e) => toggleDefaultMode(e);
+colorPicker.oninput = (e) => { color = toggleDefaultMode(e); };
 
 const rainbowBtn = optionsPanel.querySelector('.rainbow-btn');
-rainbowBtn.onclick = () => toggleRainbowMode();
+rainbowBtn.onclick = () => changeColorMode('rainbowMode');
 
 const eraserBtn = optionsPanel.querySelector('.eraser-btn');
-eraserBtn.onclick = () => toggleEraserMode();
+eraserBtn.onclick = () => changeColorMode('eraserMode');
 
 const clearBtn = optionsPanel.querySelector('.clear-btn');
 clearBtn.onclick = () => clearDrawingBoard();
-
-const gridSizeArea = optionsPanel.querySelector('.grid-size-area');
-const gridSizeLabel = gridSizeArea.querySelector('label');
-const gridSizeInputElement = gridSizeArea.querySelector('input');
-gridSizeInputElement.oninput = (e) => { gridSize = e.target.value; gridSizeLabel.textContent = `${gridSize} * ${gridSize}`; generateDrawingBoard(); };

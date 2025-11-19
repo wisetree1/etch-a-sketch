@@ -6,16 +6,30 @@
 
 .game-container {
     display: flex;
-    justify-content: space-evenly;
+    flex-flow: column wrap;
+    align-items: center;
 
     margin-top: 30px;
 }
 
-.options-panel {
+.grid-size-area {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 5px;
 
+    font-size: 30px;
+
+    margin-bottom: 40px;
+}
+
+.grid-size-area input {
+    width: 300px;
+}
+
+.options-panel {
+    display: flex;
+    align-items: center;
     gap: 30px;
 }
 
@@ -26,6 +40,9 @@
     border: none;
     border-radius: 50%;
     appearance: none;
+
+    margin-left: 50px;
+    margin-right: 50px;
 }
 
 input[type='color']::-webkit-color-swatch {
@@ -38,23 +55,12 @@ input[type='color']::-webkit-color-swatch-wrapper {
   padding: 0;
 }
 
-
 .options-panel button {
-    width: 300px;
+    width: 200px;
     font-size: 20px;
 
     padding: 10px 30px;
     border-radius: 10px;
-}
-
-.options-panel .grid-size-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-
-    font-size: 30px;
-    width: 100%;
 }
 
 .options-panel input[type='range'] {
@@ -62,8 +68,9 @@ input[type='color']::-webkit-color-swatch-wrapper {
 }
 
 .drawing-board {
-    display: inline-block;
-    align-self: center;
+    margin-bottom: 70px;
+
+    display: grid;
     
     width: 500px;
     height: 500px;
