@@ -19,19 +19,25 @@
     gap: 30px;
 }
 
-.options-panel input {
+.options-panel input[type='color'] {
     width: 100px;
     height: 100px;
-
-    padding: 15px;
-    
+ 
     border: none;
-    background-color: transparent;
+    border-radius: 50%;
+    appearance: none;
 }
 
-.options-panel input[type="color"] {
+input[type='color']::-webkit-color-swatch {
+    border: none;
     border-radius: 50%;
+    appearance: none;
 }
+
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
 
 .options-panel button {
     width: 300px;
@@ -39,6 +45,20 @@
 
     padding: 10px 30px;
     border-radius: 10px;
+}
+
+.options-panel .grid-size-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 30px;
+    width: 100%;
+}
+
+.options-panel input[type='range'] {
+    width: 100%;
 }
 
 .drawing-board {
@@ -62,7 +82,7 @@
 }
 
 /* .grid-cell {
-    border: 0.5px solid rgb(0, 0, 0);
+    background-color: aquamarine;
 } */
 
 .active {
