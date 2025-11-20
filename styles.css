@@ -4,6 +4,10 @@
     box-sizing: border-box;
 }
 
+body {
+    background-color: #ededed;
+}
+
 .game-container {
     display: flex;
     flex-flow: column wrap;
@@ -17,6 +21,8 @@
 
     display: flex;
     justify-content: space-between;
+
+    margin-bottom: 40px;
 }
 
 .grid-size-area, .brush-size-area {
@@ -24,10 +30,14 @@
     flex-direction: column;
     align-items: center;
     gap: 5px;
+}
 
+.grid-size-area .name-label, .brush-size-area .name-label {
+    font-size: 25px;
+}
+
+.grid-size-area .size-label, .brush-size-area .size-label {
     font-size: 30px;
-
-    margin-bottom: 40px;
 }
 
 .grid-size-area input {
@@ -68,7 +78,7 @@ input[type='color']::-webkit-color-swatch-wrapper {
 }
 
 .options-panel button {
-    width: 200px;
+    width: 220px;
     font-size: 20px;
 
     padding: 10px 30px;
@@ -80,14 +90,14 @@ input[type='color']::-webkit-color-swatch-wrapper {
 }
 
 .drawing-board {
-    margin-bottom: 70px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.24) 2px 2px 12px;
+    margin-bottom: 50px;
 
     display: grid;
     
     width: 600px;
     height: 600px;
-
-    outline: 0.5px solid rgb(0, 0, 0);
 
     -webkit-user-drag: none;
     user-select: none;
@@ -100,6 +110,7 @@ input[type='color']::-webkit-color-swatch-wrapper {
     display: flex;
 }
 
-.btn-active {
-    background-color: rgb(64, 201, 23);
+.options-panel button:hover, .btn-active{
+    background-color: rgb(204, 21, 85);
+    color: rgb(255, 255, 255);
 }

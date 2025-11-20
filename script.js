@@ -13,7 +13,6 @@ function generateDrawingBoard(parentNode, beforeNode, gridSize, isGridOn, brushS
     drawingBoard.classList.add('drawing-board');
     drawingBoard.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
     drawingBoard.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
-    drawingBoard.style.outline = isGridOn ? 'none' : '0.5px solid rgb(0, 0, 0)';
 
     for (let i = 0; i < gridSize * gridSize; i++) {
         const cell = document.createElement('div');
@@ -94,13 +93,12 @@ function paintSquare(cellIndex, gridSize, brushSize, targetColor) {
     }
 }
 
-function toggleGrid(isGridOn, drawingBoard, gridBtn) {
+function toggleGrid(isGridOn, gridBtn) {
     let newGridOn = !isGridOn;
     cells.forEach((item) => {
         item.style.border = newGridOn ? '0.5px solid rgb(0, 0, 0)' : 'none';
     });
 
-    drawingBoard.style.outline = newGridOn ? 'none' : '0.5px solid rgb(0, 0, 0)';
     gridBtn.classList.toggle('btn-active');
     return newGridOn;
 }
@@ -145,7 +143,7 @@ brushSizeInputElement.oninput = (e) => {
 const optionsPanel = document.body.querySelector('.options-panel');
 let isGridOn = false;
 const gridBtn = optionsPanel.querySelector('.grid-btn');
-gridBtn.onclick = () => { isGridOn = toggleGrid(isGridOn, drawingBoard, gridBtn); };
+gridBtn.onclick = () => { isGridOn = toggleGrid(isGridOn, gridBtn); };
 
 let color = '#000000';
 const colorPicker = optionsPanel.querySelector('.color-picker');
