@@ -2,7 +2,7 @@
 
 let cells = [];
 
-function generateDrawingBoard(parentNode, beforeNode, gridSize, isGridOn) {
+function generateDrawingBoard(parentNode, beforeNode, gridSize, isGridOn, brushSize = 1) {
     cells = [];
 
     let oldDrawingBoard = parentNode.querySelector('.drawing-board');
@@ -24,36 +24,84 @@ function generateDrawingBoard(parentNode, beforeNode, gridSize, isGridOn) {
         drawingBoard.appendChild(cell);
     }
 
-    drawingBoard.onmouseover = (e) => paintCell(e);
-    drawingBoard.onmousedown = (e) => paintCell(e);
+    setDrawingBoardListeners(drawingBoard, gridSize, brushSize);
 
     beforeNode.after(drawingBoard);
     return drawingBoard;
+}
+
+function setDrawingBoardListeners(drawingBoard, gridSize, brushSize) {
+    drawingBoard.onmouseover = (e) => paintCell(e, gridSize, brushSize);
+    drawingBoard.onmousedown = (e) => paintCell(e, gridSize, brushSize);
 }
 
 function clearDrawingBoard() {
     cells.forEach((item) => item.style.backgroundColor = 'white');
 }
 
-function paintCell(e) {
+function getColor() {
+    let color;
+    for (const mode in colorModes) {
+        if (colorModes[mode].isModeOn) {
+            color = colorModes[mode].getColor();
+            break;
+        }
+    }
+    return color;
+}
+
+function paintCell(e, gridSize, brushSize) {
     // check whether the primary button was pressed or not
     if (+e.buttons != 1) {
         return;
     }
 
-    const cellIndex = e.target.classList.item(1).split('cell')[1];
+    const cellIndex = Number(e.target.classList.item(1).split('cell')[1]);
     let targetColor = getColor();
 
-    cells[+cellIndex].style.backgroundColor = targetColor;
+    paintSquare(cellIndex, gridSize, brushSize, targetColor);
 }
 
-function toggleGrid(isGridOn, drawingBoard) {
+function paintSquare(cellIndex, gridSize, brushSize, targetColor) {
+    const cellRow = Math.floor(cellIndex / gridSize);
+    const cellColumn = cellIndex % gridSize;
+    const cellOffset = Math.floor(brushSize / 2);
+
+    let columnLeft = cellColumn;
+    while (columnLeft > 0 && columnLeft > cellColumn - cellOffset) {
+        columnLeft--;
+    }
+
+    let columnRight = cellColumn;
+    while (columnRight < gridSize - 1 && columnRight < cellColumn + cellOffset) {
+        columnRight++;
+    }
+    
+    let rowTop = cellRow;
+    while (rowTop > 0 && rowTop > cellRow - cellOffset) {
+        rowTop--;
+    }
+
+    let rowBottom = cellRow;
+    while (rowBottom < gridSize - 1 && rowBottom < cellRow + cellOffset) {
+        rowBottom++;
+    }
+
+    for (let r = rowTop; r <= rowBottom; r++) {
+        for (let c = columnLeft; c <= columnRight; c++) {
+            cells[r * gridSize + c].style.backgroundColor = targetColor;
+        }
+    }
+}
+
+function toggleGrid(isGridOn, drawingBoard, gridBtn) {
     let newGridOn = !isGridOn;
     cells.forEach((item) => {
         item.style.border = newGridOn ? '0.5px solid rgb(0, 0, 0)' : 'none';
     });
 
     drawingBoard.style.outline = newGridOn ? 'none' : '0.5px solid rgb(0, 0, 0)';
+    gridBtn.classList.toggle('btn-active');
     return newGridOn;
 }
 
@@ -69,61 +117,35 @@ function getRandomColor() {
 }
 
 const gameContainer = document.body.querySelector('.game-container');
-let gridSize = 16;
 
-const gridSizeArea = gameContainer.querySelector('.grid-size-area');
-const gridSizeLabel = gridSizeArea.querySelector('label');
+const sizeArea = gameContainer.querySelector('.size-area');
+let gridSize = 16;
+let brushSize = 1;
+
+let drawingBoard = generateDrawingBoard(gameContainer, sizeArea, gridSize, false);
+
+const gridSizeArea = sizeArea.querySelector('.grid-size-area');
+const gridSizeLabel = gridSizeArea.querySelector('.size-label');
 const gridSizeInputElement = gridSizeArea.querySelector('input');
 gridSizeInputElement.oninput = (e) => { 
-    gridSize = e.target.value; 
-    gridSizeLabel.textContent = `${gridSize} * ${gridSize}`; 
-    drawingBoard = generateDrawingBoard(gameContainer, gridSizeArea, gridSize, isGridOn);
+    gridSize = +e.target.value; 
+    gridSizeLabel.textContent = `${gridSize} x ${gridSize}`; 
+    drawingBoard = generateDrawingBoard(gameContainer, sizeArea, gridSize, isGridOn, brushSize);
 };
 
-let drawingBoard = generateDrawingBoard(gameContainer, gridSizeArea, gridSize, false);
-
-const colorModes = {
-    defaultMode: {
-        isModeOn: true,
-        getColor: () => color, 
-    },
-    rainbowMode: {
-        isModeOn: false,
-        getColor: () => getRandomColor(),        
-    },
-    eraserMode: {
-        isModeOn: false,
-        getColor: () => 'white',
-    },
-}
-
-function changeColorMode(newMode) {
-    if (newMode != 'defaultMode' && colorModes[newMode].isModeOn) {
-        colorModes[newMode].isModeOn = false;
-        colorModes.defaultMode.isModeOn = true;
-        return;
-    }
-
-    for (const mode in colorModes) {
-        colorModes[mode].isModeOn = (mode == newMode);
-    }
-}
-
-function getColor() {
-    let color;
-    for (const mode in colorModes) {
-        if (colorModes[mode].isModeOn) {
-            color = colorModes[mode].getColor();
-            break;
-        }
-    }
-    return color;
-}
+const brushSizeArea = sizeArea.querySelector('.brush-size-area');
+const brushSizeLabel = brushSizeArea.querySelector('.size-label');
+const brushSizeInputElement = brushSizeArea.querySelector('input');
+brushSizeInputElement.oninput = (e) => { 
+    brushSize = +e.target.value; 
+    brushSizeLabel.textContent = `${brushSize} x ${brushSize}`;
+    setDrawingBoardListeners(drawingBoard, gridSize, brushSize);
+};
 
 const optionsPanel = document.body.querySelector('.options-panel');
 let isGridOn = false;
 const gridBtn = optionsPanel.querySelector('.grid-btn');
-gridBtn.onclick = () => { isGridOn = toggleGrid(isGridOn, drawingBoard); };
+gridBtn.onclick = () => { isGridOn = toggleGrid(isGridOn, drawingBoard, gridBtn); };
 
 let color = '#000000';
 const colorPicker = optionsPanel.querySelector('.color-picker');
@@ -134,6 +156,44 @@ rainbowBtn.onclick = () => changeColorMode('rainbowMode');
 
 const eraserBtn = optionsPanel.querySelector('.eraser-btn');
 eraserBtn.onclick = () => changeColorMode('eraserMode');
+
+const colorModes = {
+    defaultMode: {
+        isModeOn: true,
+        getColor: () => color, 
+        button: colorPicker,
+    },
+    rainbowMode: {
+        isModeOn: false,
+        getColor: () => getRandomColor(),        
+        button: rainbowBtn,
+    },
+    eraserMode: {
+        isModeOn: false,
+        getColor: () => 'white',
+        button: eraserBtn,
+    },
+}
+
+function changeColorMode(newMode) {
+    if (newMode != 'defaultMode' && colorModes[newMode].isModeOn) {
+        colorModes[newMode].isModeOn = false;
+        colorModes[newMode].button.classList.remove('btn-active'); 
+
+        colorModes.defaultMode.isModeOn = true;
+        return;
+    }
+    
+    colorModes[newMode].isModeOn = true;
+    colorModes[newMode].button.classList.add('btn-active');
+    for (const mode in colorModes) {
+        if (mode == newMode) {
+            continue;
+        } 
+        colorModes[mode].isModeOn = false;
+        colorModes[mode].button.classList.remove('btn-active');
+    }
+}
 
 const clearBtn = optionsPanel.querySelector('.clear-btn');
 clearBtn.onclick = () => clearDrawingBoard();

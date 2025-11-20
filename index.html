@@ -8,9 +8,17 @@
 </head>
 <body>
     <div class="game-container">
-        <div class="grid-size-area">
-            <label for="grid-size-range">16 * 16</label>
-            <input type="range" id="grid-size-range" min="1" max="100" value="16"> 
+        <div class="size-area">
+            <div class="grid-size-area">
+                <label for="grid-size-range">Grid size</label>
+                <label for="grid-size-range" class="size-label">16 x 16</label>
+                <input type="range" id="grid-size-range" min="1" max="100" value="16"> 
+            </div>
+            <div class="brush-size-area">
+                <label for="brush-size-range">Brush size</label>
+                <label for="brush-size-range" class="size-label">1 x 1</label>
+                <input type="range" id="brush-size-range" min="1" max="21" step="2" value="1"> 
+            </div>
         </div>
         <div class="options-panel">
             <button class="rainbow-btn">Rainbow mode</button>

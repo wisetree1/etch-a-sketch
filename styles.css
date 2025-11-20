@@ -12,7 +12,14 @@
     margin-top: 30px;
 }
 
-.grid-size-area {
+.size-area {
+    width: 600px;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.grid-size-area, .brush-size-area {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,8 +34,13 @@
     width: 300px;
 }
 
+.brush-size-area input {
+    width: 200px;
+}
+
 .options-panel {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 30px;
 }
@@ -72,8 +84,8 @@ input[type='color']::-webkit-color-swatch-wrapper {
 
     display: grid;
     
-    width: 500px;
-    height: 500px;
+    width: 600px;
+    height: 600px;
 
     outline: 0.5px solid rgb(0, 0, 0);
 
@@ -88,10 +100,6 @@ input[type='color']::-webkit-color-swatch-wrapper {
     display: flex;
 }
 
-/* .grid-cell {
-    background-color: aquamarine;
-} */
-
-.active {
-    background-color: rgb(220, 220, 220);
+.btn-active {
+    background-color: rgb(64, 201, 23);
 }
