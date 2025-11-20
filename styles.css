@@ -4,8 +4,17 @@
     box-sizing: border-box;
 }
 
+@font-face {
+    font-family: 'KaushanScript';
+    src: url(./fonts/KaushanScript-Regular.ttf);
+}
+
 body {
     background-color: #ededed;
+}
+
+body * {
+    font-family: 'KaushanScript', serif;
 }
 
 .game-container {
@@ -33,11 +42,11 @@ body {
 }
 
 .grid-size-area .name-label, .brush-size-area .name-label {
-    font-size: 25px;
+    font-size: 30px;
 }
 
 .grid-size-area .size-label, .brush-size-area .size-label {
-    font-size: 30px;
+    font-size: 35px;
 }
 
 .grid-size-area input {
@@ -78,8 +87,8 @@ input[type='color']::-webkit-color-swatch-wrapper {
 }
 
 .options-panel button {
-    width: 220px;
-    font-size: 20px;
+    width: 240px;
+    font-size: 25px;
 
     padding: 10px 30px;
     border-radius: 10px;
